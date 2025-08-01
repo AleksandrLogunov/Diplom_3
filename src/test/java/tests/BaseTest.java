@@ -3,7 +3,6 @@ package tests;
 import api.User;
 import api.UserClient;
 import factory.WebDriverFactory;
-import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
