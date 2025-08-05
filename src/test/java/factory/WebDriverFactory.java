@@ -4,6 +4,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.io.File;
+import java.net.URL;
+
 public class WebDriverFactory {
 
     private static final String BROWSER_PROP = System.getProperty("browser", "chrome");
@@ -12,13 +15,13 @@ public class WebDriverFactory {
     public static WebDriver createWebDriver() {
         switch (BROWSER) {
             case CHROME:
-                System.setProperty("webdriver.chrome.driver", "driver/chrome/chromedriver-win64/chromedriver.exe");
+                setupDriverFromResources("webdriver.chrome.driver", "driver/chrome/chromedriver.exe");
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.addArguments("--remote-allow-origins=*");
                 return new ChromeDriver(chromeOptions);
 
             case YANDEX:
-                System.setProperty("webdriver.chrome.driver", "driver/yandex/yandexdriver-25.6.0.2261-win64/yandexdriver.exe");
+                setupDriverFromResources("webdriver.chrome.driver", "driver/yandex/yandexdriver.exe");
                 ChromeOptions yandexOptions = new ChromeOptions();
                 yandexOptions.setBinary("C:\\Users\\Turbo\\AppData\\Local\\Yandex\\YandexBrowser\\Application\\browser.exe");
                 yandexOptions.addArguments("--remote-allow-origins=*");
@@ -27,5 +30,16 @@ public class WebDriverFactory {
             default:
                 throw new RuntimeException("Неизвестный браузер: " + BROWSER);
         }
+    }
+    private static void setupDriverFromResources(String propertyName, String resourcePath) {
+        URL resource = WebDriverFactory.class.getClassLoader().getResource(resourcePath);
+        if (resource == null) {
+            throw new RuntimeException("Драйвер не найден в папке ресурсов: " + resourcePath);
+        }
+        File driverFile = new File(resource.getFile());
+        if (!driverFile.exists()) {
+            throw new RuntimeException("Файл драйвера не существует: " + driverFile.getAbsolutePath());
+        }
+        System.setProperty(propertyName, driverFile.getAbsolutePath());
     }
 }
